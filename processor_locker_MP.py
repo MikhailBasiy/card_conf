@@ -150,16 +150,20 @@ def process_locker_MP(file_cases, file_doors):
             )
 
             appropriate_doors = list(appropriate_doors.itertuples())
-            for idx, single_door in enumerate(appropriate_doors):
-                same_doors_wardrobe = deepcopy(wardrobe)
-                single_door_material = re.search("(ДСП|Зеркало)", single_door.Номенклатура).group(1)
+            for door in appropriate_doors:
+                door_material = re.search("(ДСП|Зеркало)", single_door.Номенклатура).group(1)
+                if re.search("распашн", door, re.IGNORECASE):
+                    wardrobe.doors_type = "распашные"
+                    wardrobe_type_for_cardname = "Распашной"
+                elif re.search("складн", door, re.IGNORECASE):
+                    wardrobe.doors_type = "складные"
+                    wardrobe_type_for_cardname = "Гармошка"
                 # Наименование карточки
-                same_doors_wardrobe.card_name = f"Шкаф {wardrobe.series} 2-х дверный " \
-                                                        f"{single_door_material.replace('Зеркало', 'Зеркала')}, " \
-                                                        f"{same_doors_wardrobe.size}"
+                wardrobe.card_name = f"Шкаф {wardrobe.series} 2-х дверный " \
+                                     f"{wardrobe_type_for_cardname}"
                 # Материалы фасада
-                same_doors_wardrobe.front_materials = single_door_material.replace("ДСП", "ЛДСП").lower()
-                same_doors_wardrobe.manufacturer_front_materials = same_doors_wardrobe.front_materials.replace(
+                wardrobe.front_materials = door_material.replace("ДСП", "ЛДСП").lower()
+                wardrobe.manufacturer_front_materials = wardrobe.front_materials.replace(
                     "лдсп", 
                     wardrobe.manufacturer_case_color
                 ).replace("зеркало","Зеркало")
@@ -172,12 +176,12 @@ def process_locker_MP(file_cases, file_doors):
                     same_doors_wardrobe.front_materials)
                 ).replace("лдсп;лдсп", "лдсп")
                 # Артикул
-                same_doors_wardrobe.article = f"{same_doors_wardrobe.depth if same_doors_wardrobe.depth == 45 else 1}" \
-                            f"E{article_series_collection[same_doors_wardrobe.series_collection]}" \
-                            f"_{same_doors_wardrobe.width}" \
-                            f"{same_doors_wardrobe.height if same_doors_wardrobe.height == 240 else ''}" \
-                            f"_{article_color.get(same_doors_wardrobe.manufacturer_case_color, '')}"
-                
+               # same_doors_wardrobe.article = f"{same_doors_wardrobe.depth if same_doors_wardrobe.depth == 45 else 1}" \
+               #             f"E{article_series_collection[same_doors_wardrobe.series_collection]}" \
+               #             f"_{same_doors_wardrobe.width}" \
+               #             f"{same_doors_wardrobe.height if same_doors_wardrobe.height == 240 else ''}" \
+               #             f"_{article_color.get(same_doors_wardrobe.manufacturer_case_color, '')}"
+               # 
                 door_properties = (
                     single_door.Номенклатура,
                     single_door.Код_номенклатуры,
